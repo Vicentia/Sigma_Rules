@@ -1,0 +1,24 @@
+title: RDP Network Connection (Sysmon)
+id: 813e8c66-7fd4-4f42-bbd2-c706849d6ee1
+status: experimental
+description: Detects potential RDP traffic via Sysmon network connection events.
+author: Vicentia Stroe
+date: 2025-12-07
+
+logsource:
+  product: windows
+  service: sysmon
+
+detection:
+  selection_3389:
+    EventID: 3
+    DestinationPort: 3389
+  selection_443:
+    EventID: 3
+    DestinationPort: 443
+  condition: selection_3389 or selection_443
+
+falsepositives:
+  - Legitimate RDP connections by users who forgot their password
+
+level: medium
