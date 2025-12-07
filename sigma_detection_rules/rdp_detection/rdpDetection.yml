@@ -10,13 +10,12 @@ logsource:
   service: sysmon
 
 detection:
-  selection_3389:
-    EventID: 3
-    DestinationPort: 3389
   selection_443:
     EventID: 3
     DestinationPort: 443
-  condition: selection_3389 or selection_443
+  selection_client: 
+    Image: "*\\mstsc.exe"
+  condition: selection_443 and selection_client
 
 falsepositives:
   - Legitimate RDP connections by users who forgot their password
