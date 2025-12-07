@@ -1,0 +1,61 @@
+title: Suspicious Download from PowerShell 
+id: e4ff8628-c81d-4d91-ab91-50f0fcfc04c5
+status: experimental 
+description: > 
+  Most of the time Windows hides double extensions and the downloaded file looks like a normal one but this rule is made to be triggered by a double extension download 
+references:
+    - https://sigmahq.io/docs/basics/rules.html
+    - https://attack.mitre.org/techniques/T1036/007/
+  
+author: Vicentia Stroe
+date: 2025-11-19
+logsource: 
+  product: windows 
+  category: file_event #Process id 11 because we want this rule to be triggered at the download time 
+detection:
+  selection_path: 
+    TargetFilename|contains: 
+    - '\Users\'
+    - '\Downloads\'
+    - '\Desktop\'
+    - '\AppData\Local\Temp\'
+  selection_double_extension:
+    TargetFilename|endswith:  
+    - '.exe.zip'
+    - 'rar.exe '
+    - 'scr.exe'
+    - 'bat.exe'
+    - 'cmd.exe'
+    - 'js.exe'
+    - 'vbs.exe'
+    - 'ps1.exe'
+    - 'dll.exe'
+    - 'jar.exe'
+    - 'com.exe'
+    - 'pif.exe'
+    - 'hta.exe'
+    - 'doc.exe'
+    - 'xls.exe'
+    - 'ppt.exe'
+    - 'jpg.scr'
+    - 'pdf.exe'
+
+  condition: selection_path and selection_double_extension 
+fields: 
+  - UtcTime 
+  - TargetFilename
+  - Image 
+  - User
+  - ProcessId
+  - ProcessGuid
+  - ParentImage
+  - ParentCommandLine
+
+level: medium
+falsepositives: 
+  - It can be that the downloaded file is indeed a valid one that happens to contains . that do not indicate a double extension
+  - It is a compress file that already contains an executable file inside like .... exe.zip 
+tags:
+  - attack.execution
+  - attack.initial_access
+  - attack.t1204  

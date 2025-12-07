@@ -1,0 +1,38 @@
+title: Suspicious Download from PowerShell 
+id: d7a11611-40eb-442e-b7fe-150cc7c1ae0a
+status: experimental 
+description: > 
+  It will look for suspicious downloads and by suspicious I mean downloads that contain: curl, wget or Net.webClient
+references:
+    - https://sigmahq.io/docs/basics/rules.html
+author: Vicentia Stroe
+date: 2025-11-18
+logsource: 
+  product: windows 
+  category: process_creation 
+detection:
+  selection: 
+    Image|endswith: 
+      - '\powershell.exe'
+      - '\pwsh.exe'
+    CommandLine|contains:
+      - 'Invoke-WebRequest'
+      - 'curl'
+      - 'wget'
+      - 'Net.WebClient'
+  condition: selection
+fields: 
+  - UtcTime 
+  - Image 
+  - CommandLine  
+  - User
+  - ParentImage
+  - ParentCommandLine
+  #I choose these fields because from my point of vew they are the most important since we need to know who made the action (the user) and some information about the parent process to be able tom track it back  
+level: medium
+falsepositives: 
+  - The user was actually downloading a legitimate file via PowerShell
+tags:
+  - attack.execution
+  - attack.command-and-control
+  - attack.t1105   

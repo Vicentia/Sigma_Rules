@@ -1,0 +1,35 @@
+title: Detect suspicious behaviour but not windows trusted processes 
+id: b87f8d0b-de65-45ee-82ec-f7164532910f
+status: experimental
+description: Detects suspicious registry writes but excludes trusted Windows processes
+author: Vicentia Stroe 
+date: 2025-11-19
+logsource:
+    category: registry_set
+    product: windows
+
+detection:
+    suspicious_write:
+        TargetObject|contains:
+            - "\\Software\\Microsoft\\Windows\\CurrentVersion\\Run"
+            - "\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce"
+            - "\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Notifications\\Data"
+            - "\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies"
+    exclude_trusted:
+        Image|endswith:
+            - "\\SecurityHealthHost.exe"
+            - "\\svchost.exe"
+            - "\\TrustedInstaller.exe"
+            - "\\explorer.exe"
+            - "\\services.exe"
+            - "\\lsass.exe"
+    condition: suspicious_write AND NOT exclude_trusted
+
+fields:
+    - Image
+    - TargetObject
+    - Details
+
+falsepositives:
+    - It is actually a trusted process making legitimate changes
+level: medium

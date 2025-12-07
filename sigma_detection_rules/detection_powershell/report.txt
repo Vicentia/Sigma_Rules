@@ -1,0 +1,20 @@
+I started by faking the download of malicious code by using the command:  Invoke-WebRequest https://example.com -OutFile C:\Users\Public\test.txt; I will move to look into Even viewer and the process creates 3 events with the events id: 1 (because of the creation of the process),3 (because it is trying to connect to the internet to send the DNS query),11 (for the creation of the file), 22 (the actual DNS query for example.com). After I idedntified at least one of the process, I can look at the processId which in my case was 788 and I willl look for the ProcessId: 788 with the EventId 1. I found it and it has the details: 
+
+Process Create:
+RuleName: -
+UtcTime: 2025-11-18 02:27:48.117
+ProcessGuid: {7d11f335-d9a4-691b-6e01-000000000300}
+ProcessId: 788
+Image: C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe
+FileVersion: 10.0.26100.3323 (WinBuild.160101.0800)
+Description: Windows PowerShell
+Product: Microsoft® Windows® Operating System
+Company: Microsoft Corporation
+OriginalFileName: PowerShell.EXE
+
+which checks because of the image which is powershell. (I entered the command in the Power Shell).
+
+I moved on to write the script: 
+I generated the id from the website: https://www.uuidgenerator.net/version4 and it gave me the ID: d7a11611-40eb-442e-b7fe-150cc7c1ae0a
+
+After I finished to write the script, I checked it by using sigma tools:  sigma check .\powershell_download.yml and after I convert it to a query language (I chose Splunk) by using the command:  sigma convert -t splunk -p sysmon .\powershell_download.yml  
